@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.qhakaton.kindergarten.adapter.ChildrenAdapter;
+import com.qhakaton.kindergarten.bus.event.EventAddChild;
+import com.qhakaton.kindergarten.bus.event.EventUpdateBeacon;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -31,6 +33,14 @@ public class MainActivityFragment extends Fragment {
 		_recyclerView.setAdapter(_adapter);
 
 		return inflater.inflate(R.layout.fragment_main, container, false);
+	}
+
+	public void onEvent(EventAddChild event) {
+		_adapter.addChild(event.child);
+	}
+
+	public void onEvent(EventUpdateBeacon event) {
+		_adapter.updateBeacon(event.beacon);
 	}
 
 	private ChildrenAdapter _adapter;

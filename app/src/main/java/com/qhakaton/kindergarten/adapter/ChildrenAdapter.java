@@ -6,9 +6,12 @@ import android.view.ViewGroup;
 
 import com.qhakaton.kindergarten.R;
 import com.qhakaton.kindergarten.adapter.holder.ChildHolder;
+import com.qhakaton.kindergarten.model.Beacon;
 import com.qhakaton.kindergarten.model.Child;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by Dawid Drozd aka Gelldur on 20.02.16.
@@ -36,8 +39,46 @@ public class ChildrenAdapter extends RecyclerAdapter {
 
 	public void addChild(Child child) {
 		_childs.add(child);
-		notifyItemInserted(_childs.size() - 1);
+
+		sort();
+		notifyDataSetChanged();
 	}
 
-	private ArrayList<Child> _childs;
+	public void updateBeacon(final Beacon beacon) {
+		int foundPosition = -1;
+		for (int i = 0; i < _childs.size(); ++i) {
+			final Child child = _childs.get(i);
+			if (child.getBeaconIdentifier().equals(beacon)) {
+				foundPosition = i;
+				child.updateBeacon(beacon);
+				break;
+			}
+		}
+
+		if (foundPosition < 0) {
+			return;
+		}
+
+		sort();
+
+		for (int i = 0; i < _childs.size(); ++i) {
+			final Child child = _childs.get(i);
+			if (child.getBeaconIdentifier().equals(beacon)) {
+				notifyItemMoved(foundPosition, i);
+				return;
+			}
+		}
+
+	}
+
+	private void sort() {
+		Collections.sort(_childs, new Comparator<Child>() {
+			@Override
+			public int compare(final Child lhs, final Child rhs) {
+				return lhs.getDistance() - rhs.getDistance();
+			}
+		});
+	}
+
+	private ArrayList<Child> _childs = new ArrayList<>(16);
 }

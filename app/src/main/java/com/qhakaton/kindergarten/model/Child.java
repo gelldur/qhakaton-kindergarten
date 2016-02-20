@@ -22,6 +22,10 @@ public class Child {
 		return _distance;
 	}
 
+	public void updateBeacon(final Beacon beacon) {
+		_beaconIdentifier = beacon;
+	}
+
 	private int _distance = -1;
 	private String _name;
 	private Beacon _beaconIdentifier;
