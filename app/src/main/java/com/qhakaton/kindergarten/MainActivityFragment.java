@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.qhakaton.kindergarten.adapter.ChildrenAdapter;
+import com.qhakaton.kindergarten.bus.GlobalEventBus;
 import com.qhakaton.kindergarten.bus.event.EventAddChild;
 import com.qhakaton.kindergarten.bus.event.EventUpdateBeacon;
 
@@ -22,17 +23,27 @@ public class MainActivityFragment extends Fragment {
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		_adapter = new ChildrenAdapter(getActivity());
+		GlobalEventBus.registerSafe(this);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.fragment_main, container, false);
+	}
 
-		_recyclerView = (RecyclerView) getActivity().findViewById(R.id.childrenList);
+	@Override
+	public void onViewCreated(final View view, final Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		_recyclerView = (RecyclerView) view.findViewById(R.id.childrenList);
 		_recyclerView.setItemAnimator(new DefaultItemAnimator());
 		_recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
 		_recyclerView.setAdapter(_adapter);
+	}
 
-		return inflater.inflate(R.layout.fragment_main, container, false);
+	@Override
+	public void onDestroy() {
+		GlobalEventBus.unregisterSafe(this);
+		super.onDestroy();
 	}
 
 	public void onEvent(EventAddChild event) {

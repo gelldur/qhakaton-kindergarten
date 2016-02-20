@@ -1,13 +1,17 @@
 package com.qhakaton.kindergarten;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+
+import com.qhakaton.kindergarten.bus.GlobalEventBus;
+import com.qhakaton.kindergarten.bus.event.EventAddChild;
+import com.qhakaton.kindergarten.model.Child;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,10 +26,24 @@ public class MainActivity extends AppCompatActivity {
 		fab.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null)
-						.show();
+				startActivityForResult(new Intent(MainActivity.this, AddChildActivity.class), REQUEST_ADD_CHILD);
 			}
 		});
+	}
+
+	@Override
+	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+		if (requestCode != MainActivity.REQUEST_ADD_CHILD) {
+			super.onActivityResult(requestCode, resultCode, data);
+			return;
+		}
+		if (resultCode != AddChildActivity.RESULT_OK) {
+			super.onActivityResult(requestCode, resultCode, data);
+			return;
+		}
+
+		Child child = data.getParcelableExtra("child");
+		GlobalEventBus.getInstance().post(new EventAddChild(child));
 	}
 
 	@Override
@@ -49,4 +67,6 @@ public class MainActivity extends AppCompatActivity {
 
 		return super.onOptionsItemSelected(item);
 	}
+
+	public static final int REQUEST_ADD_CHILD = 123;
 }
