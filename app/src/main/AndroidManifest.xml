@@ -16,7 +16,6 @@
         />
 
     <application
-        android:name="com.qhakaton.kindergarten.KindergartenApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -32,23 +31,7 @@
 			</intent-filter >
 		</activity >
 
-        <activity
-            android:name=".RangingActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-
-        <receiver
-            android:name="com.qhakaton.kindergarten.receiver.BeaconReceiver"
-            android:exported="false"
-            android:process=".sensorberg">
-            <intent-filter>
-                <action android:name="com.sensorberg.android.PRESENT_ACTION" />
-            </intent-filter>
-        </receiver>
-
 		<activity android:name=".AddChildActivity" />
-
 
 	</application >
 

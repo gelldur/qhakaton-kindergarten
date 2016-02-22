@@ -32,7 +32,7 @@ public class ChildHolder extends RecyclerView.ViewHolder implements View.OnClick
 		if (child.getDistance() < 0) {
 			_distance.setText("Unknown");
 		} else {
-			_distance.setText(child.getDistance());
+			_distance.setText(String.valueOf(child.getDistance()));
 		}
 	}
 

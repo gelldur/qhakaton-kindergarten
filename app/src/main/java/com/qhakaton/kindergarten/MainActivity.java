@@ -2,18 +2,32 @@ package com.qhakaton.kindergarten;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.qhakaton.kindergarten.bus.GlobalEventBus;
 import com.qhakaton.kindergarten.bus.event.EventAddChild;
+import com.qhakaton.kindergarten.bus.event.EventBeaconPick;
+import com.qhakaton.kindergarten.bus.event.EventUpdateBeacon;
 import com.qhakaton.kindergarten.model.Child;
 
-public class MainActivity extends AppCompatActivity {
+import org.altbeacon.beacon.Beacon;
+import org.altbeacon.beacon.BeaconConsumer;
+import org.altbeacon.beacon.BeaconManager;
+import org.altbeacon.beacon.BeaconParser;
+import org.altbeacon.beacon.RangeNotifier;
+import org.altbeacon.beacon.Region;
+
+import java.util.Collection;
+import java.util.Iterator;
+
+public class MainActivity extends AppCompatActivity implements BeaconConsumer {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +43,22 @@ public class MainActivity extends AppCompatActivity {
 				startActivityForResult(new Intent(MainActivity.this, AddChildActivity.class), REQUEST_ADD_CHILD);
 			}
 		});
+
+		_beaconManager = BeaconManager.getInstanceForApplication(this);
+		_beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:0-3=4c000215,i:4-19,i:20-21,i:22-23,p:24-24"));
+
+	}
+
+	@Override
+	protected void onPause() {
+		_beaconManager.unbind(this);
+		super.onPause();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		_beaconManager.bind(this);
 	}
 
 	@Override
@@ -69,4 +99,37 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	public static final int REQUEST_ADD_CHILD = 123;
+
+	@Override
+	public void onBeaconServiceConnect() {
+		_beaconManager.setRangeNotifier(new RangeNotifier() {
+			@Override
+			public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
+				Iterator<Beacon> iterator = beacons.iterator();
+				while (iterator.hasNext()){
+					final com.qhakaton.kindergarten.model.Beacon beacon = new com.qhakaton.kindergarten.model.Beacon(iterator.next());
+					Log.i(TAG_BEACON, "The first beacon I see is about " + beacon.distance + " meters away.");
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							EventUpdateBeacon event = new EventUpdateBeacon();
+							event.beacon = beacon;
+							GlobalEventBus.getInstance().post(event);
+						}
+					});
+
+
+				}
+			}
+		});
+
+		try {
+			_beaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static final String TAG_BEACON = "BEACON";
+	private BeaconManager _beaconManager;
 }

@@ -39,8 +39,8 @@ public class Child implements Parcelable {
 		return _beaconIdentifier;
 	}
 
-	public int getDistance() {
-		return _distance;
+	public float getDistance() {
+		return _beaconIdentifier.distance;
 	}
 
 	public void updateBeacon(final Beacon beacon) {

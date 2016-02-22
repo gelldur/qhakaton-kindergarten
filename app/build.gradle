@@ -29,8 +29,5 @@ dependencies {
 
     compile 'de.greenrobot:eventbus:2.4.0'
 
-    compile 'com.sensorberg.sdk:android-sdk-bootstrapper:2.0.0'
-    compile 'com.sensorberg.sdk:android-sdk:1.0.4'
-
     compile 'org.altbeacon:android-beacon-library:2.3.3'
 }
